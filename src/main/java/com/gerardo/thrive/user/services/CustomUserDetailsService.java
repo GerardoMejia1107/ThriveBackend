@@ -1,5 +1,7 @@
-package com.gerardo.thrive.config;
+package com.gerardo.thrive.user.services;
 
+import com.gerardo.thrive.config.CustomPasswordEncoder;
+import com.gerardo.thrive.config.UserPrincipal;
 import com.gerardo.thrive.user.dtos.request.UserRequestDto;
 import com.gerardo.thrive.user.dtos.response.UserResponseDto;
 import com.gerardo.thrive.user.entities.UserModel;
