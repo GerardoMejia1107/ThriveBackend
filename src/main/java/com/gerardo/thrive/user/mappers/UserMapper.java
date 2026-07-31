@@ -7,13 +7,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class UserMapper {
-    public UserModel toModel(UserRequestDto request) {
+    public UserModel toModel(UserRequestDto request, String hash) {
         if (request == null) return null;
 
         UserModel model = new UserModel();
         model.setEmail(request.email());
         model.setName(request.name());
         model.setUsername(request.username());
+        model.setPassword_hash(hash);
 
 
         return model;
