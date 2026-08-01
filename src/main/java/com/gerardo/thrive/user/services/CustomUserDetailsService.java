@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
-    private final @Lazy CustomPasswordEncoder customPasswordEncoder;
+    private final CustomPasswordEncoder customPasswordEncoder;
     private final UserMapper userMapper;
 
     public UserResponseDto registerUser(UserRequestDto request) {

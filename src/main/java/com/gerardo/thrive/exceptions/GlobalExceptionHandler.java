@@ -18,18 +18,7 @@ import java.util.Objects;
 @Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ProblemDetail handleMethodArgumentNotValidException(MethodArgumentNotValidException ex,
-                                                               HttpServletRequest request) {
-        ProblemDetail problemDetail =
-                ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, Objects.requireNonNull(ex.getBindingResult()
-                                .getFieldError())
-                        .getDefaultMessage());
-
-        problemDetail.setProperty("timestamp", Instant.now());
-        problemDetail.setInstance(URI.create(request.getRequestURI()));
-        return problemDetail;
-    }
+ 
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ProblemDetail handleEntityNotFoundException(EntityNotFoundException ex, HttpServletRequest request) {
