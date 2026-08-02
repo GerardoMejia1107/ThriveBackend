@@ -2,10 +2,9 @@ package com.gerardo.thrive.user.entities;
 
 
 import com.gerardo.thrive.common.BaseEntity;
+import com.gerardo.thrive.common.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.Date;
 
 @Entity
 @Table(name = "users")
@@ -33,4 +32,8 @@ public class UserModel extends BaseEntity {
 
     @Column(nullable = false)
     private String password_hash;
+
+    @Column(name = "role", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Role role = Role.CLIENT;
 }
