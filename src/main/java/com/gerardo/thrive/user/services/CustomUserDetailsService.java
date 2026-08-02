@@ -2,6 +2,7 @@ package com.gerardo.thrive.user.services;
 
 import com.gerardo.thrive.config.CustomPasswordEncoder;
 import com.gerardo.thrive.config.UserPrincipal;
+import com.gerardo.thrive.user.dtos.request.UserLoginRequestDto;
 import com.gerardo.thrive.user.dtos.request.UserRequestDto;
 import com.gerardo.thrive.user.dtos.response.UserResponseDto;
 import com.gerardo.thrive.user.entities.UserModel;
@@ -10,6 +11,7 @@ import com.gerardo.thrive.user.repositories.UserRepository;
 import lombok.AllArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -22,11 +24,29 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final CustomPasswordEncoder customPasswordEncoder;
     private final UserMapper userMapper;
 
+    /*Sing up method*/
     public UserResponseDto registerUser(UserRequestDto request) {
         String hash = customPasswordEncoder.encode(request.password());
         UserModel newUser = userRepository.save(userMapper.toModel(request, hash));
 
         return userMapper.toResponse(newUser);
+    }
+
+    /*Login Method*/
+    public UserResponseDto loginUser(UserLoginRequestDto request) {
+        UserDetails userByUsername = loadUserByUsername(request.email());
+        if (!customPasswordEncoder.matches(request.password(), userByUsername.getPassword())) {
+            throw new BadCredentialsException("Invalid credentials");
+        }
+
+        UserModel userRepositoryByEmail = userRepository.findByEmail(request.email());
+
+        return UserResponseDto.builder()
+                .id(userRepositoryByEmail.getId())
+                .email(userByUsername.getUsername())
+                .name(userRepositoryByEmail.getName())
+                .username(userByUsername.getUsername())
+                .build();
     }
 
     public UserResponseDto findUserById(Long id) {

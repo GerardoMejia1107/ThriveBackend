@@ -22,7 +22,17 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(requests -> requests.anyRequest().permitAll())
+                .authorizeHttpRequests(requests -> requests.requestMatchers("/api/security/user/test/**")
+                        .permitAll()
+                        .anyRequest()
+                        .authenticated())
+                .logout(logout -> logout
+                        .logoutUrl("/api/security/user/test/logout")
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            response.setStatus(200);
+                        })
+
+                )
                 .httpBasic(Customizer.withDefaults());
         return http.build();
     }
