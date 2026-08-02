@@ -1,7 +1,7 @@
 package com.gerardo.thrive.user.services;
 
-import com.gerardo.thrive.config.CustomPasswordEncoder;
-import com.gerardo.thrive.config.UserPrincipal;
+import com.gerardo.thrive.config.security.CustomPasswordEncoder;
+import com.gerardo.thrive.config.security.UserPrincipal;
 import com.gerardo.thrive.user.dtos.request.UserLoginRequestDto;
 import com.gerardo.thrive.user.dtos.request.UserRequestDto;
 import com.gerardo.thrive.user.dtos.response.UserResponseDto;
@@ -46,6 +46,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .email(userByUsername.getUsername())
                 .name(userRepositoryByEmail.getName())
                 .username(userByUsername.getUsername())
+                .role(userRepositoryByEmail.getRole())
                 .build();
     }
 

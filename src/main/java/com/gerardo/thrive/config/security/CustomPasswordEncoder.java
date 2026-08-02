@@ -1,4 +1,4 @@
-package com.gerardo.thrive.config;
+package com.gerardo.thrive.config.security;
 
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Null;

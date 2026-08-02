@@ -1,7 +1,8 @@
-package com.gerardo.thrive.config;
+package com.gerardo.thrive.config.security;
 
 import com.gerardo.thrive.user.entities.UserModel;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -9,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 @RequiredArgsConstructor
 public class UserPrincipal implements UserDetails {
@@ -21,8 +21,8 @@ public class UserPrincipal implements UserDetails {
      * @return the authorities, sorted by natural key (never <code>null</code>)
      */
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+    public @NonNull Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
     }
 
     /**

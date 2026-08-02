@@ -26,7 +26,8 @@ public class UserMapper {
                 userModel.getId(),
                 userModel.getName(),
                 userModel.getUsername(),
-                userModel.getEmail()
+                userModel.getEmail(),
+                userModel.getRole()
         );
     }
 }

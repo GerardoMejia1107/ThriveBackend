@@ -1,4 +1,4 @@
-package com.gerardo.thrive.config;
+package com.gerardo.thrive.config.security;
 
 import com.gerardo.thrive.user.services.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +22,10 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(requests -> requests.requestMatchers("/api/security/user/test/**")
+                .authorizeHttpRequests(auth -> auth.requestMatchers("/api/security/user/test/**")
                         .permitAll()
+                        .requestMatchers("/api/security/resource/test/**")
+                        .hasRole("ADMIN")
                         .anyRequest()
                         .authenticated())
                 .logout(logout -> logout
