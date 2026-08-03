@@ -2,8 +2,6 @@ spring:
   mvc:
     problemdetails:
       enabled: true
-  config:
-    import: optional:file:.env[.properties]
   application:
     name: thrive
   datasource:
@@ -23,6 +21,11 @@ spring:
     user:
       name: michael
       password: holly
+
 logging:
   level:
     org.springframework.security: TRACE
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION}
