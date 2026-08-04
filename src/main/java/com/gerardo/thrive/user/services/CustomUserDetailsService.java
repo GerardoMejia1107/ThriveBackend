@@ -1,5 +1,6 @@
 package com.gerardo.thrive.user.services;
 
+import com.gerardo.thrive.config.jwt.JwtService;
 import com.gerardo.thrive.config.security.CustomPasswordEncoder;
 import com.gerardo.thrive.config.security.UserPrincipal;
 import com.gerardo.thrive.user.dtos.request.UserLoginRequestDto;
@@ -11,7 +12,10 @@ import com.gerardo.thrive.user.repositories.UserRepository;
 import lombok.AllArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,18 +27,23 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
     private final CustomPasswordEncoder customPasswordEncoder;
     private final UserMapper userMapper;
+    private final JwtService jwtService;
+
 
     /*Sing up method*/
     public UserResponseDto registerUser(UserRequestDto request) {
         String hash = customPasswordEncoder.encode(request.password());
         UserModel newUser = userRepository.save(userMapper.toModel(request, hash));
 
-        return userMapper.toResponse(newUser);
+        UserDetails userJustCreatedDetails = loadUserByUsername(request.email());
+
+        return userMapper.toResponse(newUser, jwtService.generateToken(userJustCreatedDetails));
     }
 
     /*Login Method*/
     public UserResponseDto loginUser(UserLoginRequestDto request) {
         UserDetails userByUsername = loadUserByUsername(request.email());
+
         if (!customPasswordEncoder.matches(request.password(), userByUsername.getPassword())) {
             throw new BadCredentialsException("Invalid credentials");
         }
@@ -47,6 +56,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .name(userRepositoryByEmail.getName())
                 .username(userByUsername.getUsername())
                 .role(userRepositoryByEmail.getRole())
+                .token(jwtService.generateToken(userByUsername))
                 .build();
     }
 
@@ -54,7 +64,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         UserModel user = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        return userMapper.toResponse(user);
+        return userMapper.toResponse(user, null);
     }
 
     /**

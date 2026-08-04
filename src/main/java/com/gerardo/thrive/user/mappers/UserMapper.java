@@ -3,6 +3,7 @@ package com.gerardo.thrive.user.mappers;
 import com.gerardo.thrive.user.dtos.request.UserRequestDto;
 import com.gerardo.thrive.user.dtos.response.UserResponseDto;
 import com.gerardo.thrive.user.entities.UserModel;
+import jakarta.annotation.Nullable;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -20,14 +21,17 @@ public class UserMapper {
         return model;
     }
 
-    public UserResponseDto toResponse(UserModel userModel) {
+    public UserResponseDto toResponse(UserModel userModel, String token) {
         if (userModel == null) return null;
         return new UserResponseDto(
                 userModel.getId(),
                 userModel.getName(),
                 userModel.getUsername(),
                 userModel.getEmail(),
-                userModel.getRole()
+                userModel.getRole(),
+                token
+
+
         );
     }
 }
