@@ -1,4 +1,4 @@
-package com.gerardo.thrive.config.jwt;
+package com.gerardo.thrive.auth.services;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;

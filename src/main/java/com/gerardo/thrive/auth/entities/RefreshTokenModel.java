@@ -1,4 +1,4 @@
-package com.gerardo.thrive.config.jwt;
+package com.gerardo.thrive.auth.entities;
 
 import com.gerardo.thrive.user.entities.UserModel;
 import jakarta.persistence.*;

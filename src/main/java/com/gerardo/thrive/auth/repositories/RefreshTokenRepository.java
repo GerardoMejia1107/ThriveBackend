@@ -1,5 +1,6 @@
-package com.gerardo.thrive.config.jwt;
+package com.gerardo.thrive.auth.repositories;
 
+import com.gerardo.thrive.auth.entities.RefreshTokenModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

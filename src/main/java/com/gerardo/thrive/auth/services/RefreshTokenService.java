@@ -1,4 +1,4 @@
-package com.gerardo.thrive.config.jwt;
+package com.gerardo.thrive.auth.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.token.SecureRandomFactoryBean;
