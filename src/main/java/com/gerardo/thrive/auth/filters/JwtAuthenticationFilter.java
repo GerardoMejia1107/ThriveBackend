@@ -1,26 +1,26 @@
-package com.gerardo.thrive.config.jwt;
+package com.gerardo.thrive.auth.filters;
 
-import com.gerardo.thrive.user.services.CustomUserDetailsService;
+import com.gerardo.thrive.auth.services.CustomUserDetailsService;
+import com.gerardo.thrive.auth.services.JwtService;
 import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Objects;
 
 @Component
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private JwtService jwtService;
-    private CustomUserDetailsService customUserDetailsService;
+    private final JwtService jwtService;
+    private final CustomUserDetailsService customUserDetailsService;
 
     /**
      * Same contract as for {@code doFilter}, but guaranteed to be
