@@ -1,6 +1,6 @@
 package com.gerardo.thrive.user.mappers;
 
-import com.gerardo.thrive.user.dtos.request.UserRequestDto;
+import com.gerardo.thrive.auth.dtos.request.RegisterRequestDto;
 import com.gerardo.thrive.user.dtos.response.UserResponseDto;
 import com.gerardo.thrive.user.entities.UserModel;
 import jakarta.annotation.Nullable;
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class UserMapper {
-    public UserModel toModel(UserRequestDto request, String hash) {
+    public UserModel toModel(RegisterRequestDto request, String hash) {
         if (request == null) return null;
 
         UserModel model = new UserModel();
