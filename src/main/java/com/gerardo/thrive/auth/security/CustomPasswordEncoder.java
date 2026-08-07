@@ -1,7 +1,5 @@
-package com.gerardo.thrive.config.security;
-
+package com.gerardo.thrive.auth.security;
 import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.Null;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;

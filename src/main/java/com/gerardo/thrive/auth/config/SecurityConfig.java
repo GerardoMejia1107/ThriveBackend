@@ -1,12 +1,11 @@
-package com.gerardo.thrive.config.security;
+package com.gerardo.thrive.auth.config;
 
-import com.gerardo.thrive.config.jwt.JwtAuthenticationFilter;
-import com.gerardo.thrive.user.services.CustomUserDetailsService;
-import jakarta.servlet.Filter;
+import com.gerardo.thrive.auth.filters.JwtAuthenticationFilter;
+import com.gerardo.thrive.auth.security.CustomPasswordEncoder;
+import com.gerardo.thrive.auth.services.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;

@@ -1,4 +1,4 @@
-package com.gerardo.thrive.config.security;
+package com.gerardo.thrive.auth.security;
 
 import com.gerardo.thrive.user.entities.UserModel;
 import lombok.RequiredArgsConstructor;
