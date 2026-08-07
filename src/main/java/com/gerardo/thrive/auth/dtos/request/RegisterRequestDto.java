@@ -1,10 +1,10 @@
-package com.gerardo.thrive.user.dtos.request;
+package com.gerardo.thrive.auth.dtos.request;
 
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-public record UserRequestDto(
+public record RegisterRequestDto(
         @NotBlank(message = "User name is required")
         String name,
         @NotBlank(message = "Email is required")
