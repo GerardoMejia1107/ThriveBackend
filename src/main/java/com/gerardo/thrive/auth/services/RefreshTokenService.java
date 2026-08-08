@@ -1,12 +1,16 @@
 package com.gerardo.thrive.auth.services;
 
 import com.gerardo.thrive.auth.dtos.request.RefreshTokenCreateDto;
+import com.gerardo.thrive.auth.dtos.response.RefreshAccessTokenResponseDto;
+import com.gerardo.thrive.auth.entities.RefreshTokenModel;
 import com.gerardo.thrive.auth.mappers.RefreshTokenMapper;
 import com.gerardo.thrive.auth.repositories.RefreshTokenRepository;
 import com.gerardo.thrive.user.entities.UserModel;
+import com.gerardo.thrive.user.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.token.SecureRandomFactoryBean;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
@@ -27,6 +31,9 @@ public class RefreshTokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
     private final RefreshTokenMapper refreshTokenMapper;
+    private final UserRepository userRepository;
+    private final CustomUserDetailsService customUserDetailsService;
+    private final JwtService jwtService;
 
     public String issueRefreshToken(UserModel user) {
         UUID familyId = UUID.randomUUID();
@@ -42,6 +49,49 @@ public class RefreshTokenService {
                 .build()));
 
         return refreshToken;
+    }
+
+    public RefreshAccessTokenResponseDto refreshAccessToken(String rawToken) {
+        String incomingRawRefreshTokenHash = hashToken(rawToken);
+        RefreshTokenModel storedRefreshTokenHash = refreshTokenRepository.findByTokenHash(incomingRawRefreshTokenHash)
+                .orElseThrow(RuntimeException::new);
+        if (storedRefreshTokenHash.getExpiresAt()
+                .isBefore(Instant.now())) {
+            throw new RuntimeException();
+        }
+        String newStringRefreshToken = generateRawToken();
+        RefreshTokenModel newRefreshTokenModel = RefreshTokenModel.builder()
+                .tokenHash(hashToken(newStringRefreshToken))
+                .userId(storedRefreshTokenHash.getUserId())
+                .createdAt(Instant.now())
+                .expiresAt(Instant.now()
+                        .plus(duration, ChronoUnit.DAYS))
+                .build();
+
+        boolean isIncomingRefreshTokenUsable = storedRefreshTokenHash.getRevokedAt() != null; //Token was already used
+
+        if (isIncomingRefreshTokenUsable) {
+            //This means revoke is populated. Therefore, the refresh token was previously used to generate a new access token
+            //I have to invalid the family linage
+            refreshTokenRepository.findAllByFamilyId(storedRefreshTokenHash.getFamilyId())
+                    .forEach(rt -> {
+                        rt.setRevokedAt(Instant.now());
+                        refreshTokenRepository.save(rt);
+                    });
+            throw new RuntimeException();
+        } else {
+            storedRefreshTokenHash.setRevokedAt(Instant.now());
+            newRefreshTokenModel.setFamilyId(storedRefreshTokenHash.getFamilyId());
+            refreshTokenRepository.save(newRefreshTokenModel);
+        }
+
+        UserModel user = storedRefreshTokenHash.getUserId();
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(user.getEmail());
+
+        return RefreshAccessTokenResponseDto.builder()
+                .refreshToken(newStringRefreshToken)
+                .accessToken(jwtService.generateToken(userDetails))
+                .build();
     }
 
     private String generateRawToken() {
