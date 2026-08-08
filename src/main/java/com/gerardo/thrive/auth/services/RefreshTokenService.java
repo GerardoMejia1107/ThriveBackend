@@ -26,8 +26,8 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class RefreshTokenService {
-    @Value("$JWT_RT_DURATION")
-    private Long duration;
+    @Value("${jwt.refresh-expiration}")
+    private long duration;
 
     private final RefreshTokenRepository refreshTokenRepository;
     private final RefreshTokenMapper refreshTokenMapper;
@@ -49,6 +49,13 @@ public class RefreshTokenService {
                 .build()));
 
         return refreshToken;
+    }
+
+    public void logout(String rawRefreshToken) throws NoSuchAlgorithmException {
+        String incomingRawRefreshTokenHash = hashToken(rawRefreshToken);
+        RefreshTokenModel storeRefreshTokenHash = refreshTokenRepository.findByTokenHash(incomingRawRefreshTokenHash)
+                .orElseThrow(RuntimeException::new);
+        revokeFamily(storeRefreshTokenHash.getFamilyId());
     }
 
     public RefreshAccessTokenResponseDto refreshAccessToken(String rawToken) {
@@ -73,11 +80,7 @@ public class RefreshTokenService {
         if (isIncomingRefreshTokenUsable) {
             //This means revoke is populated. Therefore, the refresh token was previously used to generate a new access token
             //I have to invalid the family linage
-            refreshTokenRepository.findAllByFamilyId(storedRefreshTokenHash.getFamilyId())
-                    .forEach(rt -> {
-                        rt.setRevokedAt(Instant.now());
-                        refreshTokenRepository.save(rt);
-                    });
+            revokeFamily(storedRefreshTokenHash.getFamilyId());
             throw new RuntimeException();
         } else {
             storedRefreshTokenHash.setRevokedAt(Instant.now());
@@ -92,6 +95,14 @@ public class RefreshTokenService {
                 .refreshToken(newStringRefreshToken)
                 .accessToken(jwtService.generateToken(userDetails))
                 .build();
+    }
+
+    private void revokeFamily(UUID family_id) {
+        refreshTokenRepository.findAllByFamilyId(family_id)
+                .forEach(rt -> {
+                    rt.setRevokedAt(Instant.now());
+                    refreshTokenRepository.save(rt);
+                });
     }
 
     private String generateRawToken() {
