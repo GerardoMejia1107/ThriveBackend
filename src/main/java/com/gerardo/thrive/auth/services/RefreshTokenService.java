@@ -15,7 +15,7 @@ import java.util.HexFormat;
 @RequiredArgsConstructor
 public class RefreshTokenService {
 
-    public String generateRawToken() {
+    private String generateRawToken() {
         {
             SecureRandom secureRandom = new SecureRandom();
             //Empty bytes array -> capacity  is 32
@@ -30,7 +30,7 @@ public class RefreshTokenService {
         }
     }
 
-    public String hashToken(String rawToken) throws NoSuchAlgorithmException {
+    private String hashToken(String rawToken) throws NoSuchAlgorithmException {
         //I'll use this class to use some methods and hash the token, I set the algorithm
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         //I stored the hashed bytes in an array
