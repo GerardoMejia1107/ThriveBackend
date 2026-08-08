@@ -2,8 +2,7 @@ package com.gerardo.thrive.auth.entities;
 
 import com.gerardo.thrive.user.entities.UserModel;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
@@ -14,6 +13,9 @@ import java.util.UUID;
 @Table(name = "refresh_tokens")
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class RefreshTokenModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
