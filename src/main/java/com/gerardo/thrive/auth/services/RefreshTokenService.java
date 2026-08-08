@@ -1,6 +1,11 @@
 package com.gerardo.thrive.auth.services;
 
+import com.gerardo.thrive.auth.dtos.request.RefreshTokenCreateDto;
+import com.gerardo.thrive.auth.mappers.RefreshTokenMapper;
+import com.gerardo.thrive.auth.repositories.RefreshTokenRepository;
+import com.gerardo.thrive.user.entities.UserModel;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.token.SecureRandomFactoryBean;
 import org.springframework.stereotype.Service;
 
@@ -8,12 +13,36 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.HexFormat;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class RefreshTokenService {
+    @Value("$JWT_RT_DURATION")
+    private Long duration;
+
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenMapper refreshTokenMapper;
+
+    public String issueRefreshToken(UserModel user) throws NoSuchAlgorithmException {
+        UUID familyId = UUID.randomUUID();
+        String refreshToken = generateRawToken();
+        Instant expires = Instant.now()
+                .plus(duration, ChronoUnit.DAYS);
+
+        refreshTokenRepository.save(refreshTokenMapper.toModel(RefreshTokenCreateDto.builder()
+                .familyId(familyId)
+                .tokenHash(hashToken(refreshToken))
+                .user(user)
+                .expiresAt(expires)
+                .build()));
+
+        return refreshToken;
+    }
 
     private String generateRawToken() {
         {
