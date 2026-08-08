@@ -18,6 +18,6 @@ public class UserService {
         UserModel user = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        return userMapper.toResponse(user, null);
+        return userMapper.toResponse(user, null, null);
     }
 }

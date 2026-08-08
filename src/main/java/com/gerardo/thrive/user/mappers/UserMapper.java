@@ -21,7 +21,7 @@ public class UserMapper {
         return model;
     }
 
-    public UserResponseDto toResponse(UserModel userModel, String token) {
+    public UserResponseDto toResponse(UserModel userModel, String token, String refreshToken) {
         if (userModel == null) return null;
         return new UserResponseDto(
                 userModel.getId(),
@@ -29,7 +29,8 @@ public class UserMapper {
                 userModel.getUsername(),
                 userModel.getEmail(),
                 userModel.getRole(),
-                token
+                token,
+                refreshToken
 
 
         );

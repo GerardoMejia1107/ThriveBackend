@@ -10,6 +10,7 @@ public record UserResponseDto(
         String username,
         String email,
         Role role,
-        String token
+        String token,
+        String refreshToken
 ) {
 }

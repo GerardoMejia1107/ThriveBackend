@@ -28,7 +28,7 @@ public class RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final RefreshTokenMapper refreshTokenMapper;
 
-    public String issueRefreshToken(UserModel user) throws NoSuchAlgorithmException {
+    public String issueRefreshToken(UserModel user) {
         UUID familyId = UUID.randomUUID();
         String refreshToken = generateRawToken();
         Instant expires = Instant.now()
@@ -59,13 +59,18 @@ public class RefreshTokenService {
         }
     }
 
-    private String hashToken(String rawToken) throws NoSuchAlgorithmException {
-        //I'll use this class to use some methods and hash the token, I set the algorithm
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        //I stored the hashed bytes in an array
-        byte[] hash = digest.digest(rawToken.getBytes(StandardCharsets.UTF_8));
-        //Return hash as string format
-        return HexFormat.of()
-                .formatHex(hash);
+    private String hashToken(String rawToken) {
+        try {
+            //I'll use this class to use some methods and hash the token, I set the algorithm
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            //I stored the hashed bytes in an array
+            byte[] hash = digest.digest(rawToken.getBytes(StandardCharsets.UTF_8));
+            //Return hash as string format
+            return HexFormat.of()
+                    .formatHex(hash);
+        } catch (NoSuchAlgorithmException e) {
+            //SHA-256 is required on every JVM, so this can never happen at runtime
+            throw new IllegalStateException("SHA-256 is not available", e);
+        }
     }
 }
