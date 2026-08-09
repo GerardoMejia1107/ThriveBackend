@@ -3,10 +3,13 @@ package com.gerardo.thrive.auth.services;
 import com.gerardo.thrive.auth.dtos.request.RefreshTokenCreateDto;
 import com.gerardo.thrive.auth.dtos.response.RefreshAccessTokenResponseDto;
 import com.gerardo.thrive.auth.entities.RefreshTokenModel;
+import com.gerardo.thrive.auth.exceptions.TokenAlreadyUsedException;
+import com.gerardo.thrive.auth.exceptions.TokenExpiredException;
 import com.gerardo.thrive.auth.mappers.RefreshTokenMapper;
 import com.gerardo.thrive.auth.repositories.RefreshTokenRepository;
 import com.gerardo.thrive.user.entities.UserModel;
 import com.gerardo.thrive.user.repositories.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.token.SecureRandomFactoryBean;
@@ -54,17 +57,22 @@ public class RefreshTokenService {
     public void logout(String rawRefreshToken) throws NoSuchAlgorithmException {
         String incomingRawRefreshTokenHash = hashToken(rawRefreshToken);
         RefreshTokenModel storeRefreshTokenHash = refreshTokenRepository.findByTokenHash(incomingRawRefreshTokenHash)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "logout failed: the provided refresh token does not match any active session"));
         revokeFamily(storeRefreshTokenHash.getFamilyId());
     }
 
     public RefreshAccessTokenResponseDto refreshAccessToken(String rawToken) {
         String incomingRawRefreshTokenHash = hashToken(rawToken);
         RefreshTokenModel storedRefreshTokenHash = refreshTokenRepository.findByTokenHash(incomingRawRefreshTokenHash)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "token refresh failed: the provided refresh token does not match any active session"));
         if (storedRefreshTokenHash.getExpiresAt()
                 .isBefore(Instant.now())) {
-            throw new RuntimeException();
+            storedRefreshTokenHash.setRevokedAt(Instant.now());
+            refreshTokenRepository.save(storedRefreshTokenHash);
+            throw new TokenExpiredException("refresh token", "expiresAt",
+                    storedRefreshTokenHash.getExpiresAt());
         }
         String newStringRefreshToken = generateRawToken();
         RefreshTokenModel newRefreshTokenModel = RefreshTokenModel.builder()
@@ -81,7 +89,8 @@ public class RefreshTokenService {
             //This means revoke is populated. Therefore, the refresh token was previously used to generate a new access token
             //I have to invalid the family linage
             revokeFamily(storedRefreshTokenHash.getFamilyId());
-            throw new RuntimeException();
+            throw new TokenAlreadyUsedException("refresh token family", "familyId",
+                    storedRefreshTokenHash.getFamilyId());
         } else {
             storedRefreshTokenHash.setRevokedAt(Instant.now());
             newRefreshTokenModel.setFamilyId(storedRefreshTokenHash.getFamilyId());

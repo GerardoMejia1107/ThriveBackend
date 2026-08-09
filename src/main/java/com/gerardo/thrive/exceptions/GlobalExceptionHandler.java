@@ -1,5 +1,7 @@
 package com.gerardo.thrive.exceptions;
 
+import com.gerardo.thrive.auth.exceptions.TokenAlreadyUsedException;
+import com.gerardo.thrive.auth.exceptions.TokenExpiredException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +20,6 @@ import java.util.Objects;
 @Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
- 
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ProblemDetail handleEntityNotFoundException(EntityNotFoundException ex, HttpServletRequest request) {
@@ -28,6 +29,26 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         problemDetail.setInstance(URI.create(request.getRequestURI()));
         problemDetail.setProperty("timestamp", Instant.now());
         problemDetail.setProperty("errorCode", "ENTITY_NOT_FOUND");
+        return problemDetail;
+    }
+
+    @ExceptionHandler(TokenExpiredException.class)
+    public ProblemDetail handleTokenExpiredException(TokenExpiredException ex, HttpServletRequest request) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED,
+                ex.getMessage());
+        problemDetail.setInstance(URI.create(request.getRequestURI()));
+        problemDetail.setProperty("timestamp", Instant.now());
+        problemDetail.setProperty("errorCode", "UNAUTHORIZED");
+        return problemDetail;
+    }
+
+    @ExceptionHandler(TokenAlreadyUsedException.class)
+    public ProblemDetail handleTokenAlreadyUsedException(TokenAlreadyUsedException ex, HttpServletRequest request) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED,
+                ex.getMessage());
+        problemDetail.setInstance(URI.create(request.getRequestURI()));
+        problemDetail.setProperty("timestamp", Instant.now());
+        problemDetail.setProperty("errorCode", "TOKEN_REUSE_DETECTED");
         return problemDetail;
     }
 
