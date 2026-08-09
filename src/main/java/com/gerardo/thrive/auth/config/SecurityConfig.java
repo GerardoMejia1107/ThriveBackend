@@ -1,7 +1,9 @@
 package com.gerardo.thrive.auth.config;
 
 import com.gerardo.thrive.auth.filters.JwtAuthenticationFilter;
+import com.gerardo.thrive.auth.security.CustomDeniedHandler;
 import com.gerardo.thrive.auth.security.CustomPasswordEncoder;
+import com.gerardo.thrive.auth.security.JsonAuthenticationEntryPoint;
 import com.gerardo.thrive.auth.services.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -12,6 +14,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -21,6 +24,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JsonAuthenticationEntryPoint jsonAuthenticationEntryPoint;
+    private final CustomDeniedHandler customDeniedHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -32,8 +37,13 @@ public class SecurityConfig {
                         .hasRole("ADMIN")
                         .anyRequest()
                         .authenticated())
+                .exceptionHandling(exceptionHandling -> {
+                    exceptionHandling.accessDeniedHandler(customDeniedHandler);
+                    exceptionHandling.authenticationEntryPoint(jsonAuthenticationEntryPoint);
+                })
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .httpBasic(Customizer.withDefaults());
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .httpBasic(AbstractHttpConfigurer::disable);
         return http.build();
     }
 
