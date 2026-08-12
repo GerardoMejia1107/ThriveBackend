@@ -107,7 +107,7 @@ public class RefreshTokenService {
     }
 
     private void revokeFamily(UUID family_id) {
-        refreshTokenRepository.findAllByFamilyId(family_id)
+        refreshTokenRepository.findAllByFamilyIdAndRevokedAtIsNull(family_id)
                 .forEach(rt -> {
                     rt.setRevokedAt(Instant.now());
                     refreshTokenRepository.save(rt);
