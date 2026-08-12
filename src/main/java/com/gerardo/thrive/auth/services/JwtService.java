@@ -5,14 +5,14 @@ import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecurityException;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtService {
@@ -34,12 +34,21 @@ public class JwtService {
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date())
                 .expiration(new Date(new Date().getTime() + expiration))
+                .claim("roles", userDetails.getAuthorities()
+                        .stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .collect(
+                                Collectors.joining(", ")))
                 .signWith(secretKey, Jwts.SIG.HS256)
                 .compact();
     }
 
     public String extractUsername(String token) {
         return getClaimsFromToken(token).getSubject();
+    }
+
+    public String extractAuthorities(String token) {
+        return getClaimsFromToken(token).get("roles", String.class);
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
