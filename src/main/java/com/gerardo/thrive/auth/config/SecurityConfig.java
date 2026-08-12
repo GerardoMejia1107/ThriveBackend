@@ -4,6 +4,7 @@ import com.gerardo.thrive.auth.filters.JwtAuthenticationFilter;
 import com.gerardo.thrive.auth.security.CustomDeniedHandler;
 import com.gerardo.thrive.auth.security.CustomPasswordEncoder;
 import com.gerardo.thrive.auth.security.JsonAuthenticationEntryPoint;
+import com.gerardo.thrive.auth.security.SecurityEndpoints;
 import com.gerardo.thrive.auth.services.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -30,12 +31,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth.requestMatchers("/api/security/user/test/**")
+                .authorizeHttpRequests(auth -> auth.requestMatchers(SecurityEndpoints.PUBLIC)
                         .permitAll()
-                        .requestMatchers("/api/security/resource/test/**")
+                        .requestMatchers(SecurityEndpoints.PRIVATE)
                         .hasRole("ADMIN")
-                        .anyRequest()
+                        .requestMatchers(SecurityEndpoints.AUTHENTICATED)
                         .authenticated())
                 .exceptionHandling(exceptionHandling -> {
                     exceptionHandling.accessDeniedHandler(customDeniedHandler);
