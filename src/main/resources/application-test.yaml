@@ -1,0 +1,8 @@
+spring:
+  flyway:
+    enabled: true
+
+jwt:
+  secret: test-secret-value-not-for-production-use-only
+  expiration: 7200000
+  refresh-expiration: 7
