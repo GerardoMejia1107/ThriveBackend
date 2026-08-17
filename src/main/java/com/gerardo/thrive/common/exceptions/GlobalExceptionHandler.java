@@ -1,0 +1,64 @@
+package com.gerardo.thrive.common.exceptions;
+
+import com.gerardo.thrive.auth.exceptions.TokenAlreadyUsedException;
+import com.gerardo.thrive.auth.exceptions.TokenExpiredException;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import java.net.URI;
+import java.time.Instant;
+import java.util.Objects;
+
+@RestControllerAdvice
+@Slf4j
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ProblemDetail handleEntityNotFoundException(EntityNotFoundException ex, HttpServletRequest request) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.NOT_FOUND, ex.getMessage()
+        );
+        problemDetail.setInstance(URI.create(request.getRequestURI()));
+        problemDetail.setProperty("timestamp", Instant.now());
+        problemDetail.setProperty("errorCode", "ENTITY_NOT_FOUND");
+        return problemDetail;
+    }
+
+    @ExceptionHandler(TokenExpiredException.class)
+    public ProblemDetail handleTokenExpiredException(TokenExpiredException ex, HttpServletRequest request) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED,
+                ex.getMessage());
+        problemDetail.setInstance(URI.create(request.getRequestURI()));
+        problemDetail.setProperty("timestamp", Instant.now());
+        problemDetail.setProperty("errorCode", "UNAUTHORIZED");
+        return problemDetail;
+    }
+
+    @ExceptionHandler(TokenAlreadyUsedException.class)
+    public ProblemDetail handleTokenAlreadyUsedException(TokenAlreadyUsedException ex, HttpServletRequest request) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED,
+                ex.getMessage());
+        problemDetail.setInstance(URI.create(request.getRequestURI()));
+        problemDetail.setProperty("timestamp", Instant.now());
+        problemDetail.setProperty("errorCode", "TOKEN_REUSE_DETECTED");
+        return problemDetail;
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ProblemDetail handleException(Exception ex, HttpServletRequest request) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR,
+                ex.getMessage());
+        problemDetail.setInstance(URI.create(request.getRequestURI()));
+        problemDetail.setProperty("timestamp", Instant.now());
+        problemDetail.setProperty("errorCode", "INTERNAL_SERVER_ERROR");
+        return problemDetail;
+    }
+}
