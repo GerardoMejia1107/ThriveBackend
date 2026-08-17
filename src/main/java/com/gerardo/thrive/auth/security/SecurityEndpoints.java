@@ -13,11 +13,14 @@ public final class SecurityEndpoints {
     };
 
     public static final String[] PRIVATE = {
-            "/api/security/resource/test/data"
+            "/api/security/resource/test/data",
+            "/api/thrive/exercises/register"
     };
 
     public static final String[] AUTHENTICATED = {
             "/api/security/entity/test/ping",
-            "/api/security/user/test/logout"
+            "/api/security/user/test/logout",
+            "/api/thrive/exercises/all",
+            "/api/thrive/exercises/searchBy/*"
     };
 }

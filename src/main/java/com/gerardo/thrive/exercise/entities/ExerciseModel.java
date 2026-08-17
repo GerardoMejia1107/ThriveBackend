@@ -3,9 +3,13 @@ package com.gerardo.thrive.exercise.entities;
 import com.gerardo.thrive.common.BaseEntity;
 import com.gerardo.thrive.exercise.enums.MuscleGroup;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "exercises")
+@Setter
+@Getter
 public class ExerciseModel extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

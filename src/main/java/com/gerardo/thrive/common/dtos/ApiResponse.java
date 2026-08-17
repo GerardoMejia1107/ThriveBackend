@@ -18,6 +18,15 @@ public record ApiResponse<T>(
         return build(data, message, HttpStatus.CREATED, null);
     }
 
+    public static <T> ApiResponse<T> updated(T data, String message) {
+        return build(data, message, HttpStatus.OK, null);
+    }
+
+    public static <T> ApiResponse<T> deleted(T data, String message) {
+        return build(data, message, HttpStatus.OK, null);
+    }
+
+
     public static <T> ApiResponse<T> paged(T data, String message, PageMetadata pageMetadata) {
         return build(data, message, HttpStatus.OK, pageMetadata);
     }

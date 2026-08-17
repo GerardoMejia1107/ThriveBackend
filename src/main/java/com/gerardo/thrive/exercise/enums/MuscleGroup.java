@@ -10,7 +10,8 @@ public enum MuscleGroup {
     BICEPS("Biceps"),
     TRICEPS("Triceps"),
     ABS("Abs"),
-    FOREARMS("Forearms");
+    FOREARMS("Forearms"),
+    LEGS("Legs");
 
     private final String displayName;
 
