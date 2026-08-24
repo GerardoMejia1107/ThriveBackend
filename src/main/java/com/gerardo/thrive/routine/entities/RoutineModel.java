@@ -3,9 +3,13 @@ package com.gerardo.thrive.routine.entities;
 import com.gerardo.thrive.common.BaseEntity;
 import com.gerardo.thrive.user.entities.UserModel;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "routines")
+@Setter
+@Getter
 public class RoutineModel extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
