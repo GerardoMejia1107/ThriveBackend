@@ -110,4 +110,101 @@ public class ExerciseControllerIntegrationTest extends AbstractIntegrationTest {
                 .andExpect(MockMvcResultMatchers.status()
                         .isNotFound());
     }
+
+    @Test
+    void updateExerciseById_happyPath_return200() throws Exception {
+        ExerciseModel exercise = new ExerciseModel();
+        exercise.setName("Squat");
+        exercise.setDescription("A compound leg exercise performed with a barbell.");
+        exercise.setImageUri("https://example.com/images/squat.png");
+        exercise.setMuscleGroup(MuscleGroup.ABS);
+        ExerciseModel saved = exerciseRepository.save(exercise);
+
+        String updateRequest = """
+                {
+                "name": "Bulgarian Squat (Modification)",
+                "description": "A compound leg exercise performed with a barbell.",
+                "imageUri": "https://example.com/images/squat.png",
+                "muscleGroup": "ABS"
+                }
+                """;
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/thrive/exercises/fullUpdate/" + exercise.getId())
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updateRequest))
+                .andExpect(MockMvcResultMatchers.status()
+                        .isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.name")
+                        .value("Bulgarian Squat (Modification)"));
+    }
+
+    @Test
+    void updateExerciseById_fieldViolation_return400() throws Exception {
+        ExerciseModel exercise = new ExerciseModel();
+        exercise.setName("Squat");
+        exercise.setDescription("A compound leg exercise performed with a barbell.");
+        exercise.setImageUri("https://example.com/images/squat.png");
+        exercise.setMuscleGroup(MuscleGroup.ABS);
+        ExerciseModel saved = exerciseRepository.save(exercise);
+
+        String updateRequest = """
+                {
+                "name": "Bulgarian Squat (Modification)"
+                }
+                """;
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/thrive/exercises/fullUpdate/1")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updateRequest))
+                .andExpect(MockMvcResultMatchers.status()
+                        .isBadRequest());
+    }
+
+    @Test
+    void updateExerciseById_notFound_return404() throws Exception {
+        String updateRequest = """
+                {
+                "name": "Bulgarian Squat (Modification)",
+                "description": "A compound leg exercise performed with a barbell.",
+                "imageUri": "https://example.com/images/squat.png",
+                "muscleGroup": "ABS"
+                }
+                """;
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/thrive/exercises/fullUpdate/1")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updateRequest))
+                .andExpect(MockMvcResultMatchers.status()
+                        .isNotFound());
+    }
+
+    @Test
+    void removeExerciseById_happyPath_return200() throws Exception {
+        ExerciseModel exercise = new ExerciseModel();
+        exercise.setName("Squat");
+        exercise.setDescription("A compound leg exercise performed with a barbell.");
+        exercise.setImageUri("https://example.com/images/squat.png");
+        exercise.setMuscleGroup(MuscleGroup.ABS);
+        ExerciseModel saved = exerciseRepository.save(exercise);
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/thrive/exercises/remove/" + exercise.getId())
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(MockMvcResultMatchers.status()
+                        .isOk());
+
+    }
+
+    @Test
+    void removeExerciseById_notFound_return404() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/thrive/exercises/remove/1")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(MockMvcResultMatchers.status()
+                        .isNotFound());
+    }
 }
