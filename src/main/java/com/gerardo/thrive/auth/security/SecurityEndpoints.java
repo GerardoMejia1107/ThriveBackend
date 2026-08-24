@@ -14,7 +14,9 @@ public final class SecurityEndpoints {
 
     public static final String[] PRIVATE = {
             "/api/security/resource/test/data",
-            "/api/thrive/exercises/register"
+            "/api/thrive/exercises/register",
+            "/api/thrive/exercises/fullUpdate/*",
+            "/api/thrive/exercises/remove/*"
     };
 
     public static final String[] AUTHENTICATED = {

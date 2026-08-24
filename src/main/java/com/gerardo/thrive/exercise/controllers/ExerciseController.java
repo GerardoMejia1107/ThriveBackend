@@ -25,7 +25,7 @@ public class ExerciseController {
             @Valid @RequestBody CreateExerciseRequest request) {
         ExerciseResponse exerciseResponse = service.create(request);
         ApiResponse<ExerciseResponse> apiResponse = ApiResponse.created(exerciseResponse,
-                "Exercise '%s' created successfully" .formatted(exerciseResponse.name()));
+                "Exercise '%s' created successfully".formatted(exerciseResponse.name()));
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(apiResponse);
@@ -35,7 +35,7 @@ public class ExerciseController {
     public ResponseEntity<ApiResponse<List<ExerciseResponse>>> findAllExercises() {
         List<ExerciseResponse> exerciseResponse = service.list();
         ApiResponse<List<ExerciseResponse>> response = ApiResponse.ok(exerciseResponse,
-                "Retrieved %d exercise(s)" .formatted(exerciseResponse.size()));
+                "Retrieved %d exercise(s)".formatted(exerciseResponse.size()));
         return ResponseEntity.ok(response);
     }
 
@@ -43,7 +43,7 @@ public class ExerciseController {
     public ResponseEntity<ApiResponse<ExerciseResponse>> findExerciseById(@PathVariable Long id) {
         ExerciseResponse exerciseResponse = service.listById(id);
         ApiResponse<ExerciseResponse> response = ApiResponse.ok(exerciseResponse,
-                "Exercise '%s' retrieved successfully" .formatted(exerciseResponse.name()));
+                "Exercise '%s' retrieved successfully".formatted(exerciseResponse.name()));
         return ResponseEntity.ok(response);
     }
 
@@ -55,4 +55,12 @@ public class ExerciseController {
                 "Exercise '%s' updated successfully".formatted(exerciseResponse.name()));
         return ResponseEntity.ok(response);
     }
-}   
+
+    @DeleteMapping("/remove/{id}")
+    public ResponseEntity<ApiResponse<ExerciseResponse>> removeExerciseById(@PathVariable Long id) {
+        ExerciseResponse exerciseResponse = service.deleteById(id);
+        ApiResponse<ExerciseResponse> response = ApiResponse.deleted(exerciseResponse,
+                "Exercise '%s' deleted successfully".formatted(exerciseResponse.name()));
+        return ResponseEntity.ok(response);
+    }
+}

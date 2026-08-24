@@ -52,4 +52,11 @@ public class ExerciseService {
         return mapper.toResponse(repository.save(existing));
     }
 
+    public ExerciseResponse deleteById(Long id) {
+        ExerciseModel model = repository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
+        repository.deleteById(id);
+        return mapper.toResponse(model);
+    }
+
 }
